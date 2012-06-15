@@ -475,6 +475,20 @@ do
     pid=$!;progress_loop $pid    
 done
 
+# Newer version of sun-java-6 packaging scripts need jce_policy
+COOKIES="gpw_e24=http://edelivery.oracle.com"
+if [ "${JAVA_UPSTREAM}" == "sun-java6" ]; then
+    DOWNLOAD_URL='http://download.oracle.com/otn-pub/java/jce_policy/6/jce_policy-6.zip'
+    BIN="jce_policy-6.zip"
+else
+    DOWNLOAD_URL='http://download.oracle.com/otn-pub/java/jce/7/UnlimitedJCEPolicyJDK7.zip'
+    BIN="UnlimitedJCEPolicyJDK7.zip"
+fi
+ncecho " [x] Downloading JCE policy "
+wget --no-check-certificate --header="Cookie: ${COOKIES}" -c "${DOWNLOAD_URL}" -O ${WORK_PATH}/pkg/${BIN} >> "$log" 2>&1 &
+pid=$!;progress_loop $pid
+ln -s ${WORK_PATH}/pkg/${BIN} ${WORK_PATH}/src/${BIN} >> "$log" 2>&1 &
+
 # Determine the new version
 NEW_VERSION="${DEB_VERSION}~${LSB_CODE}1"
 
